@@ -1,0 +1,14 @@
+name = "CrystalInfoContainers"
+uuid = "7a052949-c101-4ca3-9a7e-43a2532b2fa8"
+authors = ["James.Hester <jxh@ansto.gov.au>"]
+version = "0.1.0"
+
+[deps]
+CrystalInfoFramework = "6007d9b0-c6b2-11e8-0510-1d10e825f3f1"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+
+[compat]
+DataFrames = "^1.1.0"
+MacroTools = "0.5.0"
+julia = "^1.4.0"

@@ -1,6 +1,7 @@
 # Test Data containers
 
-using CrystalInfoFramework.DataContainer
+using CrystalInfoContainers
+using CrystalInfoFramework
 using Test
 
 # Test a plain CIF as data source
@@ -8,6 +9,12 @@ using Test
 const cif_test_file = joinpath(@__DIR__,"nick1.cif")
 const multi_block_test_file = joinpath(@__DIR__,"cif_img_1.7.11.dic")
 const core_dic = joinpath(@__DIR__,"cif_core.dic")
+
+# This just sets up access to a particular block
+prepare_block(filename, blockname; native=false) = begin
+    t = Cif(joinpath(@__DIR__, "test_cifs", filename), native=native)
+    b = t[blockname]
+end
 
 prepare_files() = begin
     c = Cif(cif_test_file)
@@ -142,7 +149,7 @@ end
     @test length(get_category(my_rc, "cell")) == 1
     @test get_category(my_rc, "cell")[:volume][] == 635.3
     @test find_namespace(my_rc, "atom_site") == "CifCore"
-    @test CrystalInfoFramework.DataContainer.has_category(my_rc, "cell")
+    @test CrystalInfoContainers.has_category(my_rc, "cell")
     @test "_atom_site.fract_y" in keys(my_rc)
     # getindex
     @test my_rc[:atom_type, :atomic_mass] == [15.999, 12.011, 1.008]

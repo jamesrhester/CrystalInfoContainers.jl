@@ -169,9 +169,9 @@ end
 
 @testset "Test namespace operations" begin
     nrc = create_nspace_data()
-    @test DataContainer.has_category(nrc,"atom_type","CifCore")
-    @test DataContainer.has_category(nrc,"atom_type","dodgy")
-    @test !DataContainer.has_category(nrc,"atom_site","dodgy")
+    @test CrystalInfoContainers.has_category(nrc,"atom_type","CifCore")
+    @test CrystalInfoContainers.has_category(nrc,"atom_type","dodgy")
+    @test !CrystalInfoContainers.has_category(nrc,"atom_site","dodgy")
     @test get_data(nrc,"dodgy")["_atom_type.symbol"] == ["Oxygen","Carbon","Hydrogen"]
     @test get_data(nrc,"dodgy")["_cell.length_a"] == ["A"]
     @test haskey(nrc,"_atom_type.symbol","dodgy")
