@@ -1,0 +1,7 @@
+[deps]
+CrystalInfoContainers ="7a052949-c101-4ca3-9a7e-43a2532b2fa8"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[compat]
+Documenter = "0.25"
