@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Guide · CrystalInfoContainers documentation</title><meta name="title" content="Guide · CrystalInfoContainers documentation"/><meta property="og:title" content="Guide · CrystalInfoContainers documentation"/><meta property="twitter:title" content="Guide · CrystalInfoContainers documentation"/><meta name="description" content="Documentation for CrystalInfoContainers documentation."/><meta property="og:description" content="Documentation for CrystalInfoContainers documentation."/><meta property="twitter:description" content="Documentation for CrystalInfoContainers documentation."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">CrystalInfoContainers documentation</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Overview</a></li><li class="is-active"><a class="tocitem" href>Guide</a><ul class="internal"><li><a class="tocitem" href="#DataSources"><span>DataSources</span></a></li><li><a class="tocitem" href="#Types"><span>Types</span></a></li><li><a class="tocitem" href="#Relational-containers"><span>Relational containers</span></a></li></ul></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Guide</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Guide</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/jamesrhester/CrystalInfoContainers.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/jamesrhester/CrystalInfoContainers.jl/blob/master/docs/src/tutorial.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Guide"><a class="docs-heading-anchor" href="#Guide">Guide</a><a id="Guide-1"></a><a class="docs-heading-anchor-permalink" href="#Guide" title="Permalink"></a></h1><p>The CIF files used in these examples are provided in the <code>docs</code> directory.</p><p>This module combines CIF dictionaries with arbitrary data sources to simplify manipulation, typing and calculations of objects within those data sources.</p><h2 id="DataSources"><a class="docs-heading-anchor" href="#DataSources">DataSources</a><a id="DataSources-1"></a><a class="docs-heading-anchor-permalink" href="#DataSources" title="Permalink"></a></h2><p>CIF dictionaries can be used with any <code>DataSource</code>, providing that the datasource recognises the data names defined in the dictionary.</p><p>A <code>DataSource</code> is any object returning an array of values when supplied with a string - where that string is typically a CIF data name.  A CIF <code>Block</code> conforms to this specification, as does a simple <code>Dict{String, Any}</code>.</p><p>A CIF dictionary can be used to obtain data with correct Julia type from a <code>DataSource</code> that uses data names defined in the dictionary by  creating a <a href="../api/#CrystalInfoContainers.TypedDataSource"><code>TypedDataSource</code></a>:</p><pre><code class="language-julia hljs">using CrystalInfoContainers, CrystalInfoFramework, DataFrames
+nc = Cif(&quot;demo.cif&quot;)
+my_block = nc[&quot;saly2_all_aniso&quot;]  #could also use first(nc).second
+my_dict = DDLm_Dictionary(&quot;../test/cif_core.dic&quot;)
+bd = TypedDataSource(my_block,my_dict)
+bd[&quot;_cell.length_a&quot;]
+
+# output
+
+1-element Vector{Float64}:
+ 11.52
+</code></pre><p>Note that the array elements are now <code>Float64</code> and that the standard uncertainty has been removed. Future improvements may use <code>Measurements.jl</code> to retain standard uncertainties. Meanwhile, SUs are available by appending <code>_su</code> to the data name.</p><p>Dictionaries also allow alternative names for a data name to be recognised provided these are noted in the dictionary:</p><pre><code class="language-julia hljs">
+l = bd[&quot;_cell_length_a&quot;] #no period in name
+
+# output
+
+1-element Vector{Float64}:
+ 11.52
+</code></pre><p>where <code>_cell_length_a</code> is the old form of the data name.</p><p>Currently transformations from <code>DataSource</code> values to Julia values assume that the <code>DataSource</code> values are either already of the correct type, or are <code>String</code>s that can be directly parsed by the Julia <code>parse</code> method.</p><h3 id="Creating-new-DataSources"><a class="docs-heading-anchor" href="#Creating-new-DataSources">Creating new DataSources</a><a id="Creating-new-DataSources-1"></a><a class="docs-heading-anchor-permalink" href="#Creating-new-DataSources" title="Permalink"></a></h3><p>A file format can be used with CIF dictionaries if:</p><ol><li>It returns an <code>Array</code> of values when provided with a data name defined in the dictionary</li><li><code>Array</code>s returned for data names from the same CIF category have corresponding values at the same position in the array - that is, they line up correctly if presented as columns in a table.</li></ol><p>At a minimum, the following methods should be defined for the <code>DataSource</code>:  <code>getindex</code>, <code>haskey</code>.</p><p>If the above are true of your type, then it is sufficient to define <code>DataSource(::MyType) = IsDataSource()</code> to make it available.</p><p>If a <code>DataSource</code> can instead be modelled as a collection of <code>DataSource</code>s, <code>iterate_blocks</code> should also be defined to iterate over the constituent <code>DataSource</code>s. <code>MultiDataSource(&lt;file&gt;)</code> will then create a <code>DataSource</code> where values returned for any data names defined in the constituent blocks are automatically aligned. Such <code>MultiDataSource</code> objects can be built to form hierarchies.</p><h2 id="Types"><a class="docs-heading-anchor" href="#Types">Types</a><a id="Types-1"></a><a class="docs-heading-anchor-permalink" href="#Types" title="Permalink"></a></h2><p>A <code>TypedDataSource</code> consists of a <code>DataSource</code> and a CIF dictionary.</p><p>Values returned from a <code>TypedDataSource</code> are transformed to the appropriate Julia type as specified by the dictionary <em>if</em> the underlying  <code>DataSource</code> returns <code>String</code> values formatted in a way that Julia <code>parse</code> can understand.  Otherwise, the <code>DataSource</code> is responsible for returning the appropriate Julia type. Future improvements may add user-defined transformations if that proves necesssary.</p><p>A <code>NamespacedTypedDataSource</code> includes data from multiple namespaces. Correctly-typed data for a particular namespace can then be obtained from  the object returned by <code>select_namespace(t::NamespacedTypedDataSource,nspace)</code>.</p><h2 id="Relational-containers"><a class="docs-heading-anchor" href="#Relational-containers">Relational containers</a><a id="Relational-containers-1"></a><a class="docs-heading-anchor-permalink" href="#Relational-containers" title="Permalink"></a></h2><p>CIF dictionaries organise data names into relations (tables). These relations are strictly conformant to the relational model. A <code>RelationalContainer</code> is an object created from a <code>DataSource</code> and CIF dictionary which provides a relational view of <code>DataSource</code>, that is, data are organised into tables according to the dictionary specifications.</p><h3 id="Cif-Categories"><a class="docs-heading-anchor" href="#Cif-Categories">Cif Categories</a><a id="Cif-Categories-1"></a><a class="docs-heading-anchor-permalink" href="#Cif-Categories" title="Permalink"></a></h3><p>A CIF category (a &#39;Relation&#39; in the relational model) can be returned from a <code>RelationalContainer</code> given the category name:</p><pre><code class="language-julia hljs">
+rc = RelationalContainer(my_block, my_dict)  # Use DataSource to create RelationalContainer
+as = LoopCategory(rc, &quot;atom_site&quot;)
+
+# output
+
+Category atom_site Length 10
+10×7 DataFrame
+ Row │ fract_x   fract_z    label  adp_type  u_iso_or_equiv  occupancy  fract_ ⋯
+     │ Any       Any        Any    Any       Any             Any        Any    ⋯
+─────┼──────────────────────────────────────────────────────────────────────────
+   1 │ .5505(5)  .1605(11)  o1     Uani      .035(3)         1.00000    .6374( ⋯
+   2 │ .4009(5)  .2290(11)  o2     Uani      .033(3)         1.00000    .5162(
+   3 │ .2501(5)  .6014(13)  o3     Uani      .043(4)         1.00000    .5707(
+   4 │ .4170(7)  .4954(15)  c1     Uani      .029(4)         1.00000    .6930(
+   5 │ .3145(7)  .6425(16)  c2     Uani      .031(5)         1.00000    .6704( ⋯
+   6 │ .2789(8)  .8378(17)  c3     Uani      .040(5)         1.00000    .7488(
+   7 │ .3417(9)  .8859(18)  c4     Uani      .045(6)         1.00000    .8529(
+   8 │ .4445(9)  .7425(18)  c5     Uani      .045(6)         1.00000    .8778(
+   9 │ .4797(8)  .5487(17)  c6     Uani      .038(5)         1.00000    .7975( ⋯
+  10 │ .4549(7)  .2873(16)  c7     Uani      .029(4)         1.00000    .6092(
+                                                                1 column omitted
+</code></pre><p>where a category is either a <code>LoopCategory</code>, with one or more rows, or a <code>SetCategory</code>, which is restricted to a single row.</p><p><code>getindex</code> for CIF categories uses the indexing value as the <em>key value</em> for looking up a row in the category:</p><pre><code class="language-julia hljs">one_row = as[&quot;o1&quot;]
+one_row.fract_x
+
+# output
+
+&quot;.5505(5)&quot;
+</code></pre><p>If a category key consists multiple data names, a <code>Dict{Symbol,V}</code> should be provided as the indexing value, where <code>Symbol</code> is the <code>object_id</code> of the particular data name forming part of the key and <code>V</code> is the type of the values.</p><p>A category can be iterated over as usual, with the value of each dataname for each row available as a property:</p><pre><code class="language-julia hljs">for one_row in as
+    println(&quot;$(one_row.label) $(one_row.fract_x) $(one_row.fract_y) $(one_row.fract_z)&quot;)
+end
+
+# output
+
+o1 .5505(5) .6374(5) .1605(11)
+o2 .4009(5) .5162(5) .2290(11)
+o3 .2501(5) .5707(5) .6014(13)
+c1 .4170(7) .6930(8) .4954(15)
+c2 .3145(7) .6704(8) .6425(16)
+c3 .2789(8) .7488(8) .8378(17)
+c4 .3417(9) .8529(8) .8859(18)
+c5 .4445(9) .8778(9) .7425(18)
+c6 .4797(8) .7975(8) .5487(17)
+c7 .4549(7) .6092(7) .2873(16)
+</code></pre><p>If you prefer the <code>DataFrame</code> tools for working with tables, <code>DataFrame(c::CifCategory)</code> creates a <code>DataFrame</code>:</p><pre><code class="language-julia hljs">
+DataFrame(as)
+
+# output
+
+10×7 DataFrame
+ Row │ fract_x   fract_z    label  adp_type  u_iso_or_equiv  occupancy  fract_ ⋯
+     │ Any       Any        Any    Any       Any             Any        Any    ⋯
+─────┼──────────────────────────────────────────────────────────────────────────
+   1 │ .5505(5)  .1605(11)  o1     Uani      .035(3)         1.00000    .6374( ⋯
+   2 │ .4009(5)  .2290(11)  o2     Uani      .033(3)         1.00000    .5162(
+   3 │ .2501(5)  .6014(13)  o3     Uani      .043(4)         1.00000    .5707(
+   4 │ .4170(7)  .4954(15)  c1     Uani      .029(4)         1.00000    .6930(
+   5 │ .3145(7)  .6425(16)  c2     Uani      .031(5)         1.00000    .6704( ⋯
+   6 │ .2789(8)  .8378(17)  c3     Uani      .040(5)         1.00000    .7488(
+   7 │ .3417(9)  .8859(18)  c4     Uani      .045(6)         1.00000    .8529(
+   8 │ .4445(9)  .7425(18)  c5     Uani      .045(6)         1.00000    .8778(
+   9 │ .4797(8)  .5487(17)  c6     Uani      .038(5)         1.00000    .7975( ⋯
+  10 │ .4549(7)  .2873(16)  c7     Uani      .029(4)         1.00000    .6092(
+                                                                1 column omitted
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Wednesday 12 March 2025 10:02">Wednesday 12 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
