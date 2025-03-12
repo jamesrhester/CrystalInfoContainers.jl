@@ -119,20 +119,21 @@ as = LoopCategory(rc, "atom_site")
 
 Category atom_site Length 10
 10×7 DataFrame
- Row │ fract_x     fract_z     label       adp_type    u_iso_or_equiv  occupan ⋯
-     │ Cif Valu…?  Cif Valu…?  Cif Valu…?  Cif Valu…?  Cif Valu…?      Cif Val ⋯
+ Row │ fract_x   fract_z    label  adp_type  u_iso_or_equiv  occupancy  fract_ ⋯
+     │ Any       Any        Any    Any       Any             Any        Any    ⋯
 ─────┼──────────────────────────────────────────────────────────────────────────
-   1 │ .5505(5)    .1605(11)   o1          Uani        .035(3)         1.00000 ⋯
-   2 │ .4009(5)    .2290(11)   o2          Uani        .033(3)         1.00000
-   3 │ .2501(5)    .6014(13)   o3          Uani        .043(4)         1.00000
-   4 │ .4170(7)    .4954(15)   c1          Uani        .029(4)         1.00000
-   5 │ .3145(7)    .6425(16)   c2          Uani        .031(5)         1.00000 ⋯
-   6 │ .2789(8)    .8378(17)   c3          Uani        .040(5)         1.00000
-   7 │ .3417(9)    .8859(18)   c4          Uani        .045(6)         1.00000
-   8 │ .4445(9)    .7425(18)   c5          Uani        .045(6)         1.00000
-   9 │ .4797(8)    .5487(17)   c6          Uani        .038(5)         1.00000 ⋯
-  10 │ .4549(7)    .2873(16)   c7          Uani        .029(4)         1.00000
-                                                               2 columns omitted
+   1 │ .5505(5)  .1605(11)  o1     Uani      .035(3)         1.00000    .6374( ⋯
+   2 │ .4009(5)  .2290(11)  o2     Uani      .033(3)         1.00000    .5162(
+   3 │ .2501(5)  .6014(13)  o3     Uani      .043(4)         1.00000    .5707(
+   4 │ .4170(7)  .4954(15)  c1     Uani      .029(4)         1.00000    .6930(
+   5 │ .3145(7)  .6425(16)  c2     Uani      .031(5)         1.00000    .6704( ⋯
+   6 │ .2789(8)  .8378(17)  c3     Uani      .040(5)         1.00000    .7488(
+   7 │ .3417(9)  .8859(18)  c4     Uani      .045(6)         1.00000    .8529(
+   8 │ .4445(9)  .7425(18)  c5     Uani      .045(6)         1.00000    .8778(
+   9 │ .4797(8)  .5487(17)  c6     Uani      .038(5)         1.00000    .7975( ⋯
+  10 │ .4549(7)  .2873(16)  c7     Uani      .029(4)         1.00000    .6092(
+                                                                1 column omitted
+
 ```
 
 where a category is either a `LoopCategory`, with one or more rows, or
@@ -183,24 +184,26 @@ If you prefer the `DataFrame` tools for working with tables, `DataFrame(c::CifCa
 creates a `DataFrame`:
 
 ```jldoctest nick1
+
 DataFrame(as)
 
 # output
 
 10×7 DataFrame
- Row │ fract_x     fract_z     label       adp_type    u_iso_or_equiv  occupan ⋯
-     │ Cif Valu…?  Cif Valu…?  Cif Valu…?  Cif Valu…?  Cif Valu…?      Cif Val ⋯
+ Row │ fract_x   fract_z    label  adp_type  u_iso_or_equiv  occupancy  fract_ ⋯
+     │ Any       Any        Any    Any       Any             Any        Any    ⋯
 ─────┼──────────────────────────────────────────────────────────────────────────
-   1 │ .5505(5)    .1605(11)   o1          Uani        .035(3)         1.00000 ⋯
-   2 │ .4009(5)    .2290(11)   o2          Uani        .033(3)         1.00000
-   3 │ .2501(5)    .6014(13)   o3          Uani        .043(4)         1.00000
-   4 │ .4170(7)    .4954(15)   c1          Uani        .029(4)         1.00000
-   5 │ .3145(7)    .6425(16)   c2          Uani        .031(5)         1.00000 ⋯
-   6 │ .2789(8)    .8378(17)   c3          Uani        .040(5)         1.00000
-   7 │ .3417(9)    .8859(18)   c4          Uani        .045(6)         1.00000
-   8 │ .4445(9)    .7425(18)   c5          Uani        .045(6)         1.00000
-   9 │ .4797(8)    .5487(17)   c6          Uani        .038(5)         1.00000 ⋯
-  10 │ .4549(7)    .2873(16)   c7          Uani        .029(4)         1.00000
-                                                               2 columns omitted
+   1 │ .5505(5)  .1605(11)  o1     Uani      .035(3)         1.00000    .6374( ⋯
+   2 │ .4009(5)  .2290(11)  o2     Uani      .033(3)         1.00000    .5162(
+   3 │ .2501(5)  .6014(13)  o3     Uani      .043(4)         1.00000    .5707(
+   4 │ .4170(7)  .4954(15)  c1     Uani      .029(4)         1.00000    .6930(
+   5 │ .3145(7)  .6425(16)  c2     Uani      .031(5)         1.00000    .6704( ⋯
+   6 │ .2789(8)  .8378(17)  c3     Uani      .040(5)         1.00000    .7488(
+   7 │ .3417(9)  .8859(18)  c4     Uani      .045(6)         1.00000    .8529(
+   8 │ .4445(9)  .7425(18)  c5     Uani      .045(6)         1.00000    .8778(
+   9 │ .4797(8)  .5487(17)  c6     Uani      .038(5)         1.00000    .7975( ⋯
+  10 │ .4549(7)  .2873(16)  c7     Uani      .029(4)         1.00000    .6092(
+                                                                1 column omitted
+
 ```
 
