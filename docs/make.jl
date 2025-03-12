@@ -7,7 +7,8 @@ makedocs(sitename="CrystalInfoContainers documentation",
              "Guide" => "tutorial.md",
              "API" => "api.md"
              ],
-	  #doctest = :fix
+	  # doctests fail on Github, output width for dataframes is different
+	  doctest = false 
 	)
 
 deploydocs(
