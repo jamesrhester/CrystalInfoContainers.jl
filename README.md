@@ -1,3 +1,6 @@
+![Testing](https://github.com/jamesrhester/CrystalInfoContainers.jl/workflows/Run%20tests/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/jamesrhester/CrystalInfoContainers.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/jamesrhester/CrystalInfoContainers.jl?branch=master)
+
 # CrystalInfoContainers.jl
 
 A Julia package for using Crystallographic Information Framework (CIF)
