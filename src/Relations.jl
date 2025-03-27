@@ -7,7 +7,7 @@ export get_key_datanames, get_value, get_all_datanames, get_name, current_row
 export get_category, has_category, first_packet, construct_category, get_data
 export get_dictionary, get_packets
 export select_namespace, get_namespaces, find_namespace
-export available_catobj
+export available_catobj, name_to_catobj
 using CrystalInfoFramework:DDL2_Dictionary, DDLm_Dictionary
 
 get_key(row::Row) = begin
@@ -49,9 +49,6 @@ end
 get_row(r::Relation, k::Dict{Symbol, V} where V) = begin
     key_order = get_key_datanames(r, drop_same = true)
     numkeys = length(key_order)
-    if Set(keys(k)) != Set(key_order)
-        throw(error("Incorrect key column names supplied: $(keys(k)) != $key_order"))
-    end
     test_keys = keys(k)
     test_vals = values(k)
     for row in r
@@ -196,6 +193,10 @@ available_catobj(r::NamespacedRC) = begin
     Iterators.flatten(available_catobj(x) for x in values(r.relcons))
 end
 
+name_to_catobj(r::RelationalContainer, t::String) = begin
+    r.name_to_catobj[t]
+end
+
 """
 select_namespace(r::RelationalContainer,s::String)
 
@@ -318,17 +319,18 @@ end
 
 getindex(r::AbstractRelationalContainer, cat::Symbol, obj::Symbol) = begin
 
-    if length(get_namespaces(r)) != 1
+    gn = get_namespaces(r)
+    if length(gn) != 1
         throw(error("Namespace must be specified"))
     end
     
     dict = get_dictionary(r)
     name = find_name(dict, cat, obj)
-    r[name]
+    r[name, gn[]]
 
 end
 
-getindex(r::AbstractRelationalContainer, s) = begin
+getindex(r::AbstractRelationalContainer, s::AbstractString) = begin
 
     gn = get_namespaces(r)
     n = length(gn) > 1 ? find_namespace(r, s) : first(gn)
@@ -499,10 +501,18 @@ get_value(c::CifCategory, n::Int, colname::Symbol) = error("Define get_value for
 current_row(c::CatPacket)
  
 Support dREL legacy. Current row in dREL actually
-numbers from zero
+numbers from zero.
 """
 current_row(c::CatPacket) = begin
     return getfield(c,:id) - 1
+end
+
+current_row(s::AbstractString, c::CatPacket) = begin
+
+    #TODO: Actually implement the spec, which requires us to group by key data names,
+    # except for s, then enumerate from 0 in each group. But...legacy.
+    
+    current_row(c)
 end
 
 # TODO: child categories
@@ -611,9 +621,9 @@ length(d::LoopCategory) = begin
     if length(ks) == 0 return 1 end   # Single-block Set category
 
     if length(column_names(d)) == 0 return 0 end
-    
-    cont = get_container(d)
-    return length(cont[ks[1]])
+
+    test_name = column_names(d)[1]
+    return length(d[test_name])
     
 end
 
@@ -728,6 +738,7 @@ get_value(d::LoopCategory, n::Int, colname::Symbol) = begin
     cname = get_name(d)
 
     try
+        @debug "Accessing loop category" cname colname n
         return small_r[cname, colname][n]
     catch e
         if !(e isa KeyError)
@@ -912,8 +923,9 @@ get_key_datanames(d::LoopCategory; drop_same = false) = begin
             length(unique(c[k])) > 1
         end
     end
-    
-    [c.name_to_catobj[t][2] for t in kk]
+
+    [name_to_catobj(c, t)[2] for t in kk]
+    # [c.name_to_catobj[t][2] for t in kk]
 end
 
 get_dictionary(d::LoopCategory) = get_dictionary(get_container(d))
