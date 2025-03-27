@@ -1,7 +1,7 @@
 name = "CrystalInfoContainers"
 uuid = "0536147b-35f3-46ba-bdca-9c2438f9daa4"
 authors = ["James.Hester <jxh@ansto.gov.au>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CrystalInfoFramework = "6007d9b0-c6b2-11e8-0510-1d10e825f3f1"
