@@ -1,4 +1,5 @@
 [deps]
 CrystalInfoContainers = "0536147b-35f3-46ba-bdca-9c2438f9daa4"
 CrystalInfoFramework = "6007d9b0-c6b2-11e8-0510-1d10e825f3f1"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
