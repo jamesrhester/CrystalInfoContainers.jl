@@ -7,8 +7,9 @@ export get_key_datanames, get_value, get_all_datanames, get_name, current_row
 export get_category, has_category, first_packet, construct_category, get_data
 export get_dictionary, get_packets
 export select_namespace, get_namespaces, find_namespace
-export available_catobj, name_to_catobj
+export available_catobj
 using CrystalInfoFramework:DDL2_Dictionary, DDLm_Dictionary
+import CrystalInfoFramework: find_name, find_cat_obj
 
 get_key(row::Row) = begin
     kd = get_key_datanames(get_category(row), drop_same = true)
@@ -193,9 +194,11 @@ available_catobj(r::NamespacedRC) = begin
     Iterators.flatten(available_catobj(x) for x in values(r.relcons))
 end
 
-name_to_catobj(r::RelationalContainer, t::String) = begin
+find_cat_obj(r::RelationalContainer, t::String) = begin
     r.name_to_catobj[t]
 end
+
+find_name(r::RelationalContainer, cat, obj) = r.catobj_to_name[cat, obj]
 
 """
 select_namespace(r::RelationalContainer,s::String)
@@ -398,17 +401,29 @@ Returns a vector of values for (cat, obj) from `r`.
 """
 getindex(r::RelationalContainer, cat::Symbol, obj::Symbol) = begin
 
-    name = r.catobj_to_name[cat, obj]
-    return r[name]
+    return r[find_name(r, cat, obj)]
     
 end
 
+#==
+
+Some generic methods for Relational Containers
+
+==#
 """
     get_dictionary(r::RelationalContainer)
 
 Return the dictionary describing `r`.
 """
 get_dictionary(r::RelationalContainer, args...) = r.dict
+get_dictionary(r::NamespacedRC) = begin
+    if length(keys(r.relcons)) == 1
+        return get_dictionary(first(r.relcons))
+    else
+        throw(error("Ambiguous request for dictionary: more than one namespace"))
+    end
+end
+
 get_dictionary(r::NamespacedRC, nspace::String) = get_dictionary(r.relcons[nspace])
     
 get_data(r::RelationalContainer) = r.data
@@ -419,6 +434,14 @@ get_all_datanames(r::NamespacedRC, nspace::AbstractString) = keys(r.relcons[nspa
 
 get_namespaces(r::RelationalContainer) = [get_dic_namespace(r.dict)]
 get_namespaces(r::NamespacedRC) = keys(r.relcons)
+
+find_name(r::AbstractRelationalContainer, cat, obj) = begin
+    find_name(get_dictionary(r), cat, obj)
+end
+
+find_cat_obj(r::AbstractRelationalContainer, dname) = begin
+    find_cat_obj(get_dictionary(r), dname)
+end
 
 # **Relational Containers**
 
@@ -800,7 +823,7 @@ get_value(d::LoopCategory, k::Dict{String,V} where V, name::String) = begin
     key_order = get_key_datanames(d, drop_same=true)
     dic = get_dictionary(d)
     catname = get_name(d)
-    ckeys = [(ko, arc.catobj_to_name[catname,ko]) for ko in key_order]
+    ckeys = [(ko, find_name(arc, catname,ko)) for ko in key_order]
 
     linkvals = Dict((l[1] => k[l[2]]) for l in ckeys)
 
@@ -827,7 +850,7 @@ of `k` as Symbols.
 get_value(d::LoopCategory, k::Dict{Symbol,V} where V, name::String) = begin
     catname = get_name(d)
     arc = get_container(d)
-    newdict = Dict((arc.catobj_to_name[catname,kk]=>v) for (kk,v) in k)
+    newdict = Dict((find_name(arc, catname,kk)=>v) for (kk,v) in k)
     return get_value(d, newdict, name)
 end
 
@@ -847,8 +870,8 @@ get_value(d::LoopCategory, lookup::Dict{Symbol, V}, name::Symbol) where V = begi
     dict = get_dictionary(d)
     arc = get_container(d)
 
-    true_name = arc.catobj_to_name[c, name]
-    true_cat = arc.name_to_catobj[true_name][1]
+    true_name = find_name(arc, c, name)
+    true_cat = find_cat_obj(arc, true_name)[1]
 
     if true_cat != c
 
@@ -864,7 +887,7 @@ get_value(d::LoopCategory, lookup::Dict{Symbol, V}, name::Symbol) where V = begi
 
         for k in kk
             ln = get_linked_name(dict, k) #parent name
-            obj = arc.name_to_catobj[ln][2]
+            obj = find_cat_obj(arc, ln)[2]
             if haskey(lookup, obj)
                 keydict[k] = lookup[obj]
             end
@@ -893,10 +916,10 @@ get_object_names(d::LoopCategory) = begin
     result = copy(d.column_names)
     dict = get_dictionary(d)
     arc = get_container(d)
-    present = keys(arc.name_to_catobj)
+    present = keys(arc)
     for x in get_child_categories(d)
         extra_names = intersect(get_names_in_cat(dict, x), present) 
-        append!(result, map(x -> arc.name_to_catobj[x][2], extra_names))
+        append!(result, map(x -> find_cat_obj(arc, x)[2], extra_names))
     end
     return result
 end
@@ -924,7 +947,7 @@ get_key_datanames(d::LoopCategory; drop_same = false) = begin
         end
     end
 
-    [name_to_catobj(c, t)[2] for t in kk]
+    [find_cat_obj(c, t)[2] for t in kk]
     # [c.name_to_catobj[t][2] for t in kk]
 end
 
@@ -952,13 +975,13 @@ DataFrames.DataFrame(l::LoopCategory; canonical=false) = begin
     
     arc = get_container(l)
     catname = get_name(l)
-    rawnames = [arc.catobj_to_name[catname,o] for o in l.column_names]
+    rawnames = [find_name(arc, catname,o) for o in l.column_names]
     @debug "Raw names for data frame" rawnames
     rawdata = [arc[r] for r in rawnames]
     if canonical
         DataFrames.DataFrame(rawdata, rawnames, copycols=false)
     else
-        objects = [arc.name_to_catobj[q][2] for q in rawnames]
+        objects = [find_cat_obj(arc,q)[2] for q in rawnames]
         DataFrames.DataFrame(rawdata, objects, copycols=false)
     end
 end

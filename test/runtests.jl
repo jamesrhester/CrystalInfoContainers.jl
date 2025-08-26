@@ -2,6 +2,7 @@
 
 using CrystalInfoContainers
 using CrystalInfoFramework
+using DataFrames
 using Test
 
 # Test a plain CIF as data source
@@ -171,6 +172,16 @@ end
     @test set_cat[:volume][] == 635.3
     # Test getting a key value
     @test atom_cat["o2"].fract_z == .229
+end
+
+@testset "Test DataFrame construction" begin
+    my_rc = prepare_rc()
+    atom_cat = LoopCategory(my_rc, "atom_site")
+    df = DataFrame(atom_cat)
+    @test "adp_type" in names(df)
+    @test size(df, 1) == 10
+    i = indexin(["c3"], df[!,"label"])[]
+    @test df.u_iso_or_equiv[i] == 0.04
 end
 
 @testset "Test child categories" begin
