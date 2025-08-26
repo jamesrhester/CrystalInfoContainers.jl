@@ -920,7 +920,7 @@ get_key_datanames(d::LoopCategory; drop_same = false) = begin
     if drop_same
         filter!(kk) do k
             ul = get_ultimate_link(dic, k)
-            length(unique(c[k])) > 1
+            length(unique(c[ul])) > 1
         end
     end
 
@@ -974,7 +974,7 @@ DDLm_Dictionary(ds, att_dic::DDLm_Dictionary, dividers) = begin
     
     dicname = ds["_dictionary.title"][]
     nspace = haskey(ds,"_dictionary.namespace") ? ds["_dictionary.namespace"][] : "ddlm"
-    att_cats = get_categories(att_dic)
+    att_cats = get_categories(att_dic, head = false)
     att_info = Dict{Symbol,DataFrames.DataFrame}()
     #println("Cached values: $(ds.value_cache["ddlm"])")
     @debug "All cats: $att_cats"
