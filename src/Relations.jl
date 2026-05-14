@@ -4,12 +4,12 @@
 
 export generate_index, generate_keys
 export get_key_datanames, get_value, get_all_datanames, get_name, current_row
-export get_category, has_category, first_packet, construct_category, get_data
+export get_category, first_packet, construct_category, get_data
 export get_dictionary, get_packets
 export select_namespace, get_namespaces, find_namespace
 export available_catobj
-using CrystalInfoFramework:DDL2_Dictionary, DDLm_Dictionary
-import CrystalInfoFramework: find_name, find_cat_obj
+using CrystalInfoFramework: DDL2_Dictionary, DDLm_Dictionary
+import CrystalInfoFramework: find_name, find_cat_obj, has_category
 
 get_key(row::Row) = begin
     kd = get_key_datanames(get_category(row), drop_same = true)
@@ -82,7 +82,7 @@ RelationalContainer(data, dict::AbstractCifDictionary) = begin
 
     present = collect(keys(data))
     cache = Dict{String, String}()
-        
+
     # Include Set category keys that are missing
     
     add_set_cat_keys!(dict, data, present, cache)
@@ -119,30 +119,32 @@ NamespacedRC(data::Dict{String, T}, dicts::Dict) where T = begin
     NamespacedRC(nrc)
 end
 
+NamespacedRC(rc::RelationalContainer, nspace::String) = begin
+    NamespacedRC(Dict(nspace => rc))
+end
+
 """
     add_set_cat_keys!(dictionary, data, start)
 
-Add key data names for Set categories that have a single row or are missing.
+Add key data names for Set categories that have a single row.
 """
 add_set_cat_keys!(dict, data, start, cache) = begin
     ss = get_set_categories(dict)
     filter!(ss) do x
         l = get_keys_for_cat(dict, x)
+
         if length(l) != 1 || l[] in start
             false
         elseif get_linked_name(dict, l[]) != l[]
             false
         else
             present = intersect(get_names_in_cat(dict, x), keys(data))
-            @debug "Found datanames for $x" present
-            length(present) == 0 || length(data[first(present)]) == 1
+            length(present) > 0 && length(data[first(present)]) == 1
         end
     end
 
     extra_keys = [get_keys_for_cat(dict, x)[] for x in ss]
 
-    @debug "Creating single-valued keys" extra_keys
-    
     for k in extra_keys
         cache[k] = "unique"
     end
@@ -181,6 +183,7 @@ expand_by_parents!(dict, start) = begin
             p = get_parent_category(dict, c)
             if is_loop_category(dict, p)
                 push!(start, (Symbol(p), obj))
+                @debug "Start now $start"
             end
         end
     end    
@@ -241,6 +244,11 @@ get_category(r::AbstractRelationalContainer, one_cat::AbstractString) = begin
 end
 
 has_category(r::AbstractRelationalContainer, one_cat, nspace) = begin
+
+    if !(nspace in get_namespaces(r))
+        return false
+    end
+    
     small_r = select_namespace(r, nspace)
     dict = get_dictionary(small_r, nspace)
     one_cat = Symbol(one_cat)
@@ -611,6 +619,7 @@ should be handled by the datasource.
 """
 LoopCategory(container::AbstractRelationalContainer, catname::String, namespace::String) = begin
 
+    @debug "Start constructing Loop Category for $catname in namespace $namespace"
     # Absorb dictionary information
 
     small_r = select_namespace(container, namespace)
@@ -623,6 +632,7 @@ LoopCategory(container::AbstractRelationalContainer, catname::String, namespace:
 
     child_cats = create_children(container, catname, namespace)
 
+    @debug "Finishing Constructing LoopCategory for $catname in $namespace"
     LoopCategory(Symbol(lowercase(catname)), namespace, present_objs, child_cats, Dict(), container)
 
 end
@@ -1019,7 +1029,8 @@ end ==#
     for (tab,cols) in att_info
         if !(:master_id in propertynames(cols))
             @debug "Adding a master_id to $tab"
-            att_info[tab].master_id = [dicname]
+            n = size(att_info[tab], 1)
+            att_info[tab].master_id = fill(dicname, n)
         end
         # master_id always lower case
         att_info[tab].master_id = lowercase.(att_info[tab].master_id)
